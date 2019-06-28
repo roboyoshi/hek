@@ -1,5 +1,10 @@
 # hek
 
+Python script that checks your music collection given a set of rules
+
+- Does not modify files
+- Reads FLAC and mp3 metadata
+
 ## Depends on
 - `python-mutagen`
 
