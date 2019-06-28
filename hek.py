@@ -53,7 +53,10 @@ def tree(root):
 
 
 if len(sys.argv) != 2:
-    print("Usage: hek /path/to/music")
+    print("Usage:")
+    print("$ hek /path/to/music")
+    print("$ hek relative/path/to/music")
+    print("$ hek .")
     sys.exit(0)
 
 if len(sys.argv) is 2:
@@ -61,6 +64,7 @@ if len(sys.argv) is 2:
     if args == "-v":
         print(version)
     elif os.path.isdir(args):
+        args = os.path.abspath(args)
         print("Working on %s" % args)
         tree(args)
         if not error_found:
