@@ -9,14 +9,14 @@ Python script that checks your music collection given a set of rules
 - `python-mutagen`
 
 ## Installation
-```
+```bash
 $ git clone https://gitlab.com/dunon/hek.git
 $ cd hek
 $ sudo cp hek.py /usr/bin/hek
 ```
 
 ## Usage
-```
+```bash
 $ hek ~/Music
 $ hek .         # run on current directory
 $ hek -v        # display version
