@@ -37,3 +37,6 @@ Stored in `~/.config/hek`
 - Do no warn about missing year `ignore_year`
 - Do not warn about different albumartist/artist `ignore_albumartist`
 - Ignore how directory ends `ignore_dir_ends`
+
+## License
+hek is released under the GNU GPL-3.0 license. See `LICENSE` for details.
