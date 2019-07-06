@@ -19,6 +19,7 @@ import os
 version = "0.0.1"
 
 error_found = False
+config_dir = "./example_config/"
 
 
 def warn(file, message):
@@ -37,8 +38,9 @@ def manage_dir(f):
     if len(os.listdir(f)) is 0:
         warn(relative_path, "Empty directory")
 
-    if not name.endswith(") [FLAC]") and not name.endswith(") [mp3]"):
-        warn(relative_path, "Check directory name")
+    if not any(name.endswith(i) for i in read_config_file("rules/dir_ends")):
+        if name not in read_config_file("ignore_dir_ends"):
+            warn(relative_path, "Check directory name")
 
 
 def manage_file(f):
@@ -48,9 +50,10 @@ def manage_file(f):
     if name.startswith("."):
         warn(relative_path, "Hidden file")
 
-    if not name.endswith(".jpg") and not name.endswith(".flac") and not name.endswith(".mp3"):
+    if not any(name.endswith(i) for i in read_config_file("rules/filetypes")):
         warn(relative_path, "Check filetype")
 
+    # option
     if name.endswith(".jpg"):
         if not name == "cover.jpg":
             warn(relative_path, "Check filetype")
@@ -64,6 +67,11 @@ def tree(root):
             tree(f)
         elif os.path.isfile(f):
             manage_file(f)
+
+
+def read_config_file(filename):
+    with open(config_dir + filename) as f:
+        return [x.strip() for x in f.readlines()]
 
 
 if len(sys.argv) != 2:
