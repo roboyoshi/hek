@@ -31,25 +31,46 @@ def warn(file, message):
     print("> %s --- %s" % (file, message))
 
 
-def capitalize_after(word, symbol, name, relative_path):
-    pass
+def warn_trailing(file, message):
+    global error_found
+    error_found = True
+    print("> %s --- %s" % (file, message))
+    print("Correct trailing spaces and re-run the program")
+    sys.exit(0)
+
+
+def capitalize_after(word, symbol, relative_path):
+    i = word.rfind(symbol) + len(symbol)
+    x = 0
+    if symbol == comma:
+        x = 1
+    if len(word) > i + x and word[i] in lower_letters:
+        for e in read_config_file("ignore_quote_case"):
+            if word == e:
+                return
+        warn(relative_path, "Capitalize")
+
+        word = word[0: i - 1]
+        if symbol in word:
+            capitalize_after(word, symbol, relative_path)
 
 
 def check_name_files(name, relative_path):
-    if name.startswith(" ") or name.endswith(" "):
-        warn(relative_path, "Trailing spaces found")
-    if "  " in name:
-        warn(relative_path, "Double space found")
-    if any(i in name for i in read_config_file("rules/sequences_files")):
+    name_without_extension, extension = os.path.splitext(name)
+    if name_without_extension.startswith(" ") or name_without_extension.endswith(" "):
+        warn_trailing(relative_path, "Trailing spaces found")
+    if "  " in name_without_extension:
+        warn_trailing(relative_path, "Double space found")
+    if any(i in name_without_extension for i in read_config_file("rules/sequences_files")):
         warn(relative_path, "Contains")
     # capitalize
-    words = name.split(" ")
+    words = name_without_extension.split(" ")
     for i in words:
-        if i[:1] in lower_letters and name not in read_config_file("ignore_case"):
+        if i[:1] in lower_letters and name_without_extension not in read_config_file("ignore_case"):
             warn(relative_path, "Capitalize")
         for s in read_config_file("rules/capitalize_after"):
             if s in i:
-                capitalize_after(i, s, name, relative_path)
+                capitalize_after(i, s, relative_path)
 
 
 def manage_dir(f):
