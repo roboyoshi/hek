@@ -87,7 +87,6 @@ def init_config():
     os.system("touch -a ~/.config/hek/rules/filetypes")
     os.system("touch -a ~/.config/hek/rules/sequences_files")
     os.system("touch -a ~/.config/hek/rules/sequences_tags")
-    os.system("touch -a ~/.config/hek/rules/symbols")
 
 
 init_config()
