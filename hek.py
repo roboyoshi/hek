@@ -74,6 +74,24 @@ def read_config_file(filename):
         return [x.strip() for x in f.readlines()]
 
 
+def init_config():
+    os.system("mkdir -p ~/.config/hek/rules")
+    os.system("touch -a ~/.config/hek/ignore_albumartist")
+    os.system("touch -a ~/.config/hek/ignore_case")
+    os.system("touch -a ~/.config/hek/ignore_contains")
+    os.system("touch -a ~/.config/hek/ignore_dir_ends")
+    os.system("touch -a ~/.config/hek/ignore_quote_case")
+    os.system("touch -a ~/.config/hek/ignore_year")
+    os.system("touch -a ~/.config/hek/rules/capitalize_after")
+    os.system("touch -a ~/.config/hek/rules/dir_ends")
+    os.system("touch -a ~/.config/hek/rules/filetypes")
+    os.system("touch -a ~/.config/hek/rules/sequences_files")
+    os.system("touch -a ~/.config/hek/rules/sequences_tags")
+    os.system("touch -a ~/.config/hek/rules/symbols")
+
+
+init_config()
+
 if len(sys.argv) != 2:
     print("Usage:")
     print("$ hek /path/to/music")
