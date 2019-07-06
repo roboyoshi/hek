@@ -20,12 +20,36 @@ version = "0.0.1"
 
 error_found = False
 config_dir = "./example_config/"
+comma = "'"
+
+lower_letters = "abcdefghijklmnopqrstuvwxyzçñ"
 
 
 def warn(file, message):
     global error_found
     error_found = True
     print("> %s --- %s" % (file, message))
+
+
+def capitalize_after(word, symbol, name, relative_path):
+    pass
+
+
+def check_name_files(name, relative_path):
+    if name.startswith(" ") or name.endswith(" "):
+        warn(relative_path, "Trailing spaces found")
+    if "  " in name:
+        warn(relative_path, "Double space found")
+    if any(i in name for i in read_config_file("rules/sequences_files")):
+        warn(relative_path, "Contains")
+    # capitalize
+    words = name.split(" ")
+    for i in words:
+        if i[:1] in lower_letters and name not in read_config_file("ignore_case"):
+            warn(relative_path, "Capitalize")
+        for s in read_config_file("rules/capitalize_after"):
+            if s in i:
+                capitalize_after(i, s, name, relative_path)
 
 
 def manage_dir(f):
@@ -42,6 +66,8 @@ def manage_dir(f):
         if name not in read_config_file("ignore_dir_ends"):
             warn(relative_path, "Check directory name")
 
+    check_name_files(name, relative_path)
+
 
 def manage_file(f):
     name = f.rsplit('/', 1)[1]
@@ -57,6 +83,8 @@ def manage_file(f):
     if name.endswith(".jpg"):
         if not name == "cover.jpg":
             warn(relative_path, "Check filetype")
+
+    check_name_files(name, relative_path)
 
 
 def tree(root):
