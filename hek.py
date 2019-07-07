@@ -29,6 +29,19 @@ errors_tags = []
 tags = None
 
 
+class MusicFile:
+    tracknumber = None
+    discnumber = None
+    title = None
+    album = None
+    artist = None
+    albumartist = None
+    year = None
+    comment = None
+    relative_path = None
+    id = None
+
+
 def warn_tags(music_file, message):
     global error_found
     error_found = True
@@ -55,12 +68,12 @@ def capitalize_after(word, symbol, relative_path, music_file):
             if word == e:
                 return
         if music_file:
-            warn_files(music_file, "Capitalize")
+            warn_tags(music_file, "Capitalize")
         else:
             warn_files(relative_path, "Capitalize")
         word = word[0: i - 1]
         if symbol in word:
-            capitalize_after(word, symbol, relative_path)
+            capitalize_after(word, symbol, relative_path, music_file)
 
 
 def check_name_tags(music_file, field):
@@ -130,19 +143,6 @@ def manage_file(f):
         warn_files(relative_path, "Check filetype")
 
     check_name_files(name, relative_path)
-
-
-class MusicFile:
-    tracknumber = None
-    discnumber = None
-    title = None
-    album = None
-    artist = None
-    albumartist = None
-    year = None
-    comment = None
-    relative_path = None
-    id = None
 
 
 def check_music_file(music_file):
