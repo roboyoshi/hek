@@ -19,10 +19,7 @@ import os
 version = "0.0.1"
 
 error_found = False
-config_dir = "./example_config/"
-comma = "'"
-
-lower_letters = "abcdefghijklmnopqrstuvwxyzçñ"
+config_dir = os.path.expanduser("~/.config/hek/")
 
 
 def warn(file, message):
@@ -31,21 +28,13 @@ def warn(file, message):
     print("> %s --- %s" % (file, message))
 
 
-def warn_trailing(file, message):
-    global error_found
-    error_found = True
-    print("> %s --- %s" % (file, message))
-    print("Correct trailing spaces and re-run the program")
-    sys.exit(0)
-
-
 def capitalize_after(word, symbol, relative_path):
     i = word.rfind(symbol) + len(symbol)
     x = 0
-    if symbol == comma:
+    if symbol == "'" or symbol == "’":
         x = 1
-    if len(word) > i + x and word[i] in lower_letters:
-        for e in read_config_file("ignore_quote_case"):
+    if len(word) > i + x and str(word[i]).islower():
+        for e in read_config_file("/ignore_quote_case"):
             if word == e:
                 return
         warn(relative_path, "Capitalize")
@@ -58,17 +47,17 @@ def capitalize_after(word, symbol, relative_path):
 def check_name_files(name, relative_path):
     name_without_extension, extension = os.path.splitext(name)
     if name_without_extension.startswith(" ") or name_without_extension.endswith(" "):
-        warn_trailing(relative_path, "Trailing spaces found")
+        warn(relative_path, "Trailing spaces found")
     if "  " in name_without_extension:
-        warn_trailing(relative_path, "Double space found")
-    if any(i in name_without_extension for i in read_config_file("rules/sequences_files")):
+        warn(relative_path, "Double space found")
+    if any(i in name_without_extension for i in read_config_file("/rules/sequences_files")):
         warn(relative_path, "Contains")
     # capitalize
     words = name_without_extension.split(" ")
     for i in words:
-        if i[:1] in lower_letters and name_without_extension not in read_config_file("ignore_case"):
+        if i[:1].islower() and name_without_extension not in read_config_file("/ignore_case"):
             warn(relative_path, "Capitalize")
-        for s in read_config_file("rules/capitalize_after"):
+        for s in read_config_file("/rules/capitalize_after"):
             if s in i:
                 capitalize_after(i, s, relative_path)
 
@@ -83,8 +72,8 @@ def manage_dir(f):
     if len(os.listdir(f)) is 0:
         warn(relative_path, "Empty directory")
 
-    if not any(name.endswith(i) for i in read_config_file("rules/dir_ends")):
-        if name not in read_config_file("ignore_dir_ends"):
+    if not any(name.endswith(i) for i in read_config_file("/rules/dir_ends")):
+        if name not in read_config_file("/ignore_dir_ends"):
             warn(relative_path, "Check directory name")
 
     check_name_files(name, relative_path)
@@ -97,7 +86,7 @@ def manage_file(f):
     if name.startswith("."):
         warn(relative_path, "Hidden file")
 
-    if not any(name.endswith(i) for i in read_config_file("rules/filetypes")):
+    if not any(name.endswith(i) for i in read_config_file("/rules/filetypes")):
         warn(relative_path, "Check filetype")
 
     # option
