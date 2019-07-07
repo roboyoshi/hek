@@ -150,12 +150,14 @@ def check_music_file(music_file):
     if music_file.albumartist:
         check_name_tags(music_file, music_file.albumartist)
     if not music_file.year:
-        if music_file.album and music_file.album not in read_config_file("ignore_albumartist"):
+        if music_file.album and music_file.album not in read_config_file("ignore_year"):
             warn_tags(music_file, "Missing year")
     else:
-        pass
+        if len(music_file.year) != 4:
+            warn_tags(music_file, "Year format")
     if music_file.comment:
-        pass
+        if len(music_file.comment) != 4:
+            warn_tags(music_file, "Year format")
     if music_file.artist and music_file.albumartist:
         if not music_file.albumartist == "" and not music_file.artist == music_file.albumartist:
             if music_file.album and music_file.album not in read_config_file("ignore_albumartist"):
