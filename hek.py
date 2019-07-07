@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 import os
-from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
+from mutagen.mp3 import MP3
 from mutagen.easyid3 import EasyID3
 
 version = "0.0.1"
@@ -114,34 +114,27 @@ def check_name_files(name, relative_path):
 def manage_dir(f):
     name = f.rsplit('/', 1)[1]
     relative_path = f.rsplit(args, 1)[1]
-
     if name.startswith("."):
         warn_files(relative_path, "Hidden directory")
-
     if len(os.listdir(f)) is 0:
         warn_files(relative_path, "Empty directory")
-
     if not any(name.endswith(i) for i in read_config_file("rules/dir_ends")):
         if name not in read_config_file("ignore_dir_ends"):
             warn_files(relative_path, "Check directory name")
-
     check_name_files(name, relative_path)
 
 
 def manage_file(f):
     name = f.rsplit('/', 1)[1]
     relative_path = f.rsplit(args, 1)[1]
-
     if name.startswith("."):
         warn_files(relative_path, "Hidden file")
-
     extensions = [i for i in read_config_file("rules/filetypes") if i.startswith(".")]
     exact_matches = [i for i in read_config_file("rules/filetypes") if not i.startswith(".")]
     if not any(name.endswith(i) for i in extensions) and name not in exact_matches:
         warn_files(relative_path, "Check filetype")
     if not any(name == i for i in exact_matches) and not any(name.endswith(i) for i in extensions):
         warn_files(relative_path, "Check filetype")
-
     check_name_files(name, relative_path)
 
 
@@ -180,7 +173,6 @@ def read_tags(f):
     elif extension == ".mp3":
         mp3_file = MP3(f, ID3=EasyID3)
         tags = mp3_file.tags
-
     if "tracknumber" in tags:
         music_file.tracknumber = tags['tracknumber'][0]
     if "title" in tags:
@@ -200,7 +192,6 @@ def read_tags(f):
     music_file.relative_path = relative_path
     music_file.id = "%s - %s - %s - %s" % \
                     (music_file.albumartist, music_file.album, music_file.year, music_file.title)
-
     check_music_file(music_file)
 
 
