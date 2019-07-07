@@ -39,7 +39,7 @@ Stored in `~/.config/hek/rules`
 Stored in `~/.config/hek`
 - Some words are not capitalized `ignore_case`
 - Do not warn about lower case after ' `ignore_quote_case`
-- Allow symbols or sequences as exceptions (tags) `ignore_contains`
+- Allow symbols or sequences as exceptions `ignore_contains`
 - Do no warn about missing year `ignore_year`
 - Do not warn about different albumartist/artist `ignore_albumartist`
 - Ignore how directory ends `ignore_dir_ends`
