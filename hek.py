@@ -54,7 +54,8 @@ def check_name_files(name, relative_path):
     if "  " in name_without_extension:
         warn_files(relative_path, "Double space found")
     if any(i in name_without_extension for i in read_config_file("rules/sequences_files")):
-        warn_files(relative_path, "Contains")
+        if name not in read_config_file("ignore_contains"):
+            warn_files(relative_path, "Contains")
     # capitalize
     words = name_without_extension.split(" ")
     for i in words:
