@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 import os
+import signal
 from mutagen.flac import FLAC
 from mutagen.mp3 import MP3
 from mutagen.easyid3 import EasyID3
@@ -245,6 +246,12 @@ def show_info():
     print("$ hek /path/to/music --tags")
     sys.exit(0)
 
+
+def signal_handler(s, f):
+    sys.exit(0)
+
+
+signal.signal(signal.SIGINT, signal_handler)
 
 init_config()
 
