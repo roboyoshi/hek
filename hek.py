@@ -97,12 +97,16 @@ def manage_file(f):
     check_name_files(name, relative_path)
 
 
-def tree(root):
+def tree_tags(root):
+    pass
+
+
+def tree_files(root):
     for item in sorted(os.listdir(root)):
         f = os.path.join(root, item)
         if os.path.isdir(f):
             manage_dir(f)
-            tree(f)
+            tree_files(f)
         elif os.path.isfile(f):
             manage_file(f)
 
@@ -127,24 +131,51 @@ def init_config():
     os.system("touch -a ~/.config/hek/rules/sequences_tags")
 
 
-init_config()
-
-if len(sys.argv) != 2:
+def show_info():
     print("Usage:")
     print("$ hek /path/to/music")
     print("$ hek relative/path/to/music")
     print("$ hek .")
+    print("$ hek /path/to/music --files")
+    print("$ hek /path/to/music --tags")
     sys.exit(0)
 
-if len(sys.argv) is 2:
-    args = sys.argv[1]
-    if args == "-v":
-        print(version)
-    elif os.path.isdir(args):
-        args = os.path.abspath(args)
-        print("Working on %s" % args)
-        tree(args)
-        if not error_found:
-            print("No errors found")
-    elif not os.path.isdir(args):
-        print("%s is not a directory" % args)
+
+init_config()
+
+if len(sys.argv) != 2 and len(sys.argv) != 3:
+    show_info()
+
+else:
+    if len(sys.argv) == 2:
+        args = sys.argv[1]
+        if args == "-v":
+            print(version)
+        if os.path.isdir(args):
+            args = os.path.abspath(args)
+            print("Working on %s" % args)
+            tree_files(args)
+            tree_tags(args)
+            if not error_found:
+                print("No errors found")
+        elif not os.path.isdir(args):
+            print("%s is not a directory" % args)
+    elif len(sys.argv) == 3:
+        args = sys.argv[1]
+        option = sys.argv[2]
+        if option not in "--files" and option not in "--tags":
+            show_info()
+        if os.path.isdir(args) and option == "--files":
+            args = os.path.abspath(args)
+            print("Working on %s" % args)
+            tree_files(args)
+            if not error_found:
+                print("No errors found")
+        elif os.path.isdir(args) and option == "--tags":
+            args = os.path.abspath(args)
+            print("Working on %s" % args)
+            tree_tags(args)
+            if not error_found:
+                print("No errors found")
+        elif not os.path.isdir(args):
+            print("%s is not a directory" % args)

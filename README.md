@@ -18,8 +18,10 @@ $ sudo cp hek.py /usr/bin/hek
 ## Usage
 ```bash
 $ hek ~/Music
-$ hek .         # run on current directory
-$ hek -v        # display version
+$ hek .                 # run on current directory
+$ hek -v                # display version
+$ hek ~/Music --files   # check files only
+$ hek ~/Music --tags    # check tags only
 ```
 
 ## Configuration
