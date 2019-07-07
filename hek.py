@@ -19,13 +19,16 @@ import os
 version = "0.0.1"
 
 error_found = False
+errors = []
 config_dir = os.path.expanduser("~/.config/hek/")
 
 
 def warn(file, message):
     global error_found
     error_found = True
-    print("> %s --- %s" % (file, message))
+    if [file, message] not in errors:
+        print("> %s --- %s" % (file, message))
+    errors.append([file, message])
 
 
 def capitalize_after(word, symbol, relative_path):
