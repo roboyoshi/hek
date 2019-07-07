@@ -15,12 +15,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 import os
+from mutagen.mp3 import MP3
+from mutagen.flac import FLAC
+from mutagen.easyid3 import EasyID3
 
 version = "0.0.1"
 
 error_found = False
 errors_files = []
+errors_tags = []
 config_dir = os.path.expanduser("~/.config/hek/")
+
+tags = None
+
+
+def warn_tags(music_file, message):
+    global error_found
+    error_found = True
+    if [music_file.id, message] not in errors_tags:
+        print("> %s --- %s" % (music_file.relative_path, message))
+    errors_tags.append([music_file.relative_path, message])
 
 
 def warn_files(file, message):
@@ -100,8 +114,61 @@ def manage_file(f):
     check_name_files(name, relative_path)
 
 
+class MusicFile:
+    tracknumber = None
+    discnumber = None
+    title = None
+    album = None
+    artist = None
+    albumartist = None
+    year = None
+    comment = None
+    relative_path = None
+    id = None
+
+
+def check_music_file(music_file):
+    if music_file.tracknumber and music_file.tracknumber.startswith("0"):
+        warn_tags(music_file, "Track starts with 0")
+
+
+def read_tags(f):
+    global tags
+    relative_path = f.rsplit(args, 1)[1]
+    name, extension = os.path.splitext(f)
+    music_file = MusicFile()
+    if extension == ".flac":
+        flac_file = FLAC(f)
+        tags = flac_file.tags
+    elif extension == ".mp3":
+        mp3_file = MP3(f, ID3=EasyID3)
+        tags = mp3_file.tags
+
+    if "tracknumber" in tags:
+        music_file.tracknumber = tags['tracknumber'][0]
+    if "title" in tags:
+        music_file.title = tags['title'][0]
+    if "album" in tags:
+        music_file.album = tags['album'][0]
+    if "artist" in tags:
+        music_file.artist = tags['artist'][0]
+    if "albumartist" in tags:
+        music_file.albumartist = tags['albumartist'][0]
+    if "date" in tags:
+        music_file.year = tags['date'][0]
+    music_file.relative_path = relative_path
+    music_file.id = relative_path
+
+    check_music_file(music_file)
+
+
 def tree_tags(root):
-    pass
+    for item in sorted(os.listdir(root)):
+        f = os.path.join(root, item)
+        if os.path.isdir(f):
+            tree_tags(f)
+        elif os.path.isfile(f):
+            read_tags(f)
 
 
 def tree_files(root):
