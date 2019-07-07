@@ -154,7 +154,7 @@ else:
         args = sys.argv[1]
         if args == "-v":
             print(version)
-        if os.path.isdir(args):
+        elif os.path.isdir(args):
             args = os.path.abspath(args)
             print("Working on %s" % args)
             tree_files(args)
