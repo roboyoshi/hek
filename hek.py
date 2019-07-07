@@ -19,16 +19,16 @@ import os
 version = "0.0.1"
 
 error_found = False
-errors = []
+errors_files = []
 config_dir = os.path.expanduser("~/.config/hek/")
 
 
-def warn(file, message):
+def warn_files(file, message):
     global error_found
     error_found = True
-    if [file, message] not in errors:
+    if [file, message] not in errors_files:
         print("> %s --- %s" % (file, message))
-    errors.append([file, message])
+    errors_files.append([file, message])
 
 
 def capitalize_after(word, symbol, relative_path):
@@ -40,7 +40,7 @@ def capitalize_after(word, symbol, relative_path):
         for e in read_config_file("ignore_quote_case"):
             if word == e:
                 return
-        warn(relative_path, "Capitalize")
+        warn_files(relative_path, "Capitalize")
 
         word = word[0: i - 1]
         if symbol in word:
@@ -50,16 +50,16 @@ def capitalize_after(word, symbol, relative_path):
 def check_name_files(name, relative_path):
     name_without_extension, extension = os.path.splitext(name)
     if name_without_extension.startswith(" ") or name_without_extension.endswith(" "):
-        warn(relative_path, "Trailing spaces found")
+        warn_files(relative_path, "Trailing spaces found")
     if "  " in name_without_extension:
-        warn(relative_path, "Double space found")
+        warn_files(relative_path, "Double space found")
     if any(i in name_without_extension for i in read_config_file("rules/sequences_files")):
-        warn(relative_path, "Contains")
+        warn_files(relative_path, "Contains")
     # capitalize
     words = name_without_extension.split(" ")
     for i in words:
         if i[:1].islower() and name_without_extension not in read_config_file("ignore_case"):
-            warn(relative_path, "Capitalize")
+            warn_files(relative_path, "Capitalize")
         for s in read_config_file("rules/capitalize_after"):
             if s in i:
                 capitalize_after(i, s, relative_path)
@@ -70,14 +70,14 @@ def manage_dir(f):
     relative_path = f.rsplit(args, 1)[1]
 
     if name.startswith("."):
-        warn(relative_path, "Hidden directory")
+        warn_files(relative_path, "Hidden directory")
 
     if len(os.listdir(f)) is 0:
-        warn(relative_path, "Empty directory")
+        warn_files(relative_path, "Empty directory")
 
     if not any(name.endswith(i) for i in read_config_file("rules/dir_ends")):
         if name not in read_config_file("ignore_dir_ends"):
-            warn(relative_path, "Check directory name")
+            warn_files(relative_path, "Check directory name")
 
     check_name_files(name, relative_path)
 
@@ -87,14 +87,14 @@ def manage_file(f):
     relative_path = f.rsplit(args, 1)[1]
 
     if name.startswith("."):
-        warn(relative_path, "Hidden file")
+        warn_files(relative_path, "Hidden file")
 
     extensions = [i for i in read_config_file("rules/filetypes") if i.startswith(".")]
     exact_matches = [i for i in read_config_file("rules/filetypes") if not i.startswith(".")]
     if not any(name.endswith(i) for i in extensions) and name not in exact_matches:
-        warn(relative_path, "Check filetype")
+        warn_files(relative_path, "Check filetype")
     if not any(name == i for i in exact_matches) and not any(name.endswith(i) for i in extensions):
-        warn(relative_path, "Check filetype")
+        warn_files(relative_path, "Check filetype")
 
     check_name_files(name, relative_path)
 
