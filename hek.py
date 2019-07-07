@@ -21,11 +21,11 @@ from mutagen.easyid3 import EasyID3
 
 version = "0.0.1"
 
+config_dir = os.path.expanduser("~/.config/hek/")
+
 error_found = False
 errors_files = []
 errors_tags = []
-config_dir = os.path.expanduser("~/.config/hek/")
-
 tags = None
 
 
@@ -34,7 +34,7 @@ def warn_tags(music_file, message):
     error_found = True
     if [music_file.id, message] not in errors_tags:
         print("> %s --- %s" % (music_file.relative_path, message))
-    errors_tags.append([music_file.relative_path, message])
+    errors_tags.append([music_file.id, message])
 
 
 def warn_files(file, message):
@@ -45,7 +45,7 @@ def warn_files(file, message):
     errors_files.append([file, message])
 
 
-def capitalize_after(word, symbol, relative_path):
+def capitalize_after(word, symbol, relative_path, music_file):
     i = word.rfind(symbol) + len(symbol)
     x = 0
     if symbol == "'" or symbol == "’":
@@ -54,11 +54,30 @@ def capitalize_after(word, symbol, relative_path):
         for e in read_config_file("ignore_quote_case"):
             if word == e:
                 return
-        warn_files(relative_path, "Capitalize")
-
+        if music_file:
+            warn_files(music_file, "Capitalize")
+        else:
+            warn_files(relative_path, "Capitalize")
         word = word[0: i - 1]
         if symbol in word:
             capitalize_after(word, symbol, relative_path)
+
+
+def check_name_tags(music_file, field):
+    if field.startswith(" ") or field.endswith(" "):
+        warn_tags(music_file, "Trailing spaces found")
+    if "  " in field:
+        warn_tags(music_file, "Double space found")
+    if any(i in field for i in read_config_file("rules/sequences_tags")):
+        if field not in read_config_file("ignore_contains"):
+            warn_tags(music_file, "Contains")
+    words = field.split(" ")
+    for i in words:
+        if i[:1].islower() and field not in read_config_file("ignore_case"):
+            warn_tags(music_file, "Capitalize")
+        for s in read_config_file("rules/capitalize_after"):
+            if s in i:
+                capitalize_after(i, s, music_file.relative_path, music_file)
 
 
 def check_name_files(name, relative_path):
@@ -70,14 +89,13 @@ def check_name_files(name, relative_path):
     if any(i in name_without_extension for i in read_config_file("rules/sequences_files")):
         if name not in read_config_file("ignore_contains"):
             warn_files(relative_path, "Contains")
-    # capitalize
     words = name_without_extension.split(" ")
     for i in words:
         if i[:1].islower() and name_without_extension not in read_config_file("ignore_case"):
             warn_files(relative_path, "Capitalize")
         for s in read_config_file("rules/capitalize_after"):
             if s in i:
-                capitalize_after(i, s, relative_path)
+                capitalize_after(i, s, relative_path, None)
 
 
 def manage_dir(f):
@@ -130,6 +148,25 @@ class MusicFile:
 def check_music_file(music_file):
     if music_file.tracknumber and music_file.tracknumber.startswith("0"):
         warn_tags(music_file, "Track starts with 0")
+    if music_file.title:
+        check_name_tags(music_file, music_file.title)
+    if music_file.album:
+        check_name_tags(music_file, music_file.album)
+    if music_file.artist:
+        check_name_tags(music_file, music_file.artist)
+    if music_file.albumartist:
+        check_name_tags(music_file, music_file.albumartist)
+    if not music_file.year:
+        if music_file.album and music_file.album not in read_config_file("ignore_albumartist"):
+            warn_tags(music_file, "Missing year")
+    else:
+        pass
+    if music_file.comment:
+        pass
+    if music_file.artist and music_file.albumartist:
+        if not music_file.albumartist == "" and not music_file.artist == music_file.albumartist:
+            if music_file.album and music_file.album not in read_config_file("ignore_albumartist"):
+                warn_tags(music_file, "Artist != albumartist")
 
 
 def read_tags(f):
@@ -156,8 +193,13 @@ def read_tags(f):
         music_file.albumartist = tags['albumartist'][0]
     if "date" in tags:
         music_file.year = tags['date'][0]
+    else:
+        music_file.year = None
+    if "comment" in tags:
+        music_file.comment = tags['comment'][0]
     music_file.relative_path = relative_path
-    music_file.id = relative_path
+    music_file.id = "%s - %s - %s - %s" % \
+                    (music_file.albumartist, music_file.album, music_file.year, music_file.title)
 
     check_music_file(music_file)
 
