@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2019 Josep Oliver Arles <josep.oliver@tutanota.com>
+# Copyright (C) 2019 Josep Oliver Arlès <josep.oliver@tutanota.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
