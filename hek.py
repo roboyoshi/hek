@@ -119,9 +119,10 @@ def manage_dir(f):
         warn_files(relative_path, "Hidden directory")
     if len(os.listdir(f)) is 0:
         warn_files(relative_path, "Empty directory")
-    if not any(name.endswith(i) for i in read_config_file("rules/dir_ends")):
-        if name not in read_config_file("ignore_dir_ends"):
-            warn_files(relative_path, "Check directory name")
+    if len(read_config_file("rules/dir_ends")) > 0:
+        if not any(name.endswith(i) for i in read_config_file("rules/dir_ends")):
+            if name not in read_config_file("ignore_dir_ends"):
+                warn_files(relative_path, "Check directory name")
     check_name_files(name, relative_path)
 
 
@@ -170,37 +171,41 @@ def read_tags(f):
     relative_path = f.rsplit(args, 1)[1]
     name, extension = os.path.splitext(f)
     music_file = MusicFile()
-    if extension == ".flac":
-        flac_file = FLAC(f)
-        tags = flac_file.tags
-    elif extension == ".mp3":
-        mp3_file = MP3(f, ID3=EasyID3)
-        tags = mp3_file.tags
-    if "tracknumber" in tags:
-        music_file.tracknumber = tags['tracknumber'][0]
-    if "title" in tags:
-        music_file.title = tags['title'][0]
-    if "album" in tags:
-        music_file.album = tags['album'][0]
-    if "artist" in tags:
-        music_file.artist = tags['artist'][0]
-    if "albumartist" in tags:
-        music_file.albumartist = tags['albumartist'][0]
-    if "date" in tags:
-        music_file.year = tags['date'][0]
-    else:
-        music_file.year = None
-    if "comment" in tags:
-        music_file.comment = tags['comment'][0]
-    music_file.relative_path = relative_path
-    music_file.id = "%s - %s - %s - %s" % \
-                    (music_file.albumartist, music_file.album, music_file.year, music_file.title)
-    check_music_file(music_file)
+    try:
+        if extension == ".flac":
+            flac_file = FLAC(f)
+            tags = flac_file.tags
+        elif extension == ".mp3":
+            mp3_file = MP3(f, ID3=EasyID3)
+            tags = mp3_file.tags
+    except Exception as e:
+        print(e)
+    if tags:
+        if "tracknumber" in tags:
+            music_file.tracknumber = tags['tracknumber'][0]
+        if "title" in tags:
+            music_file.title = tags['title'][0]
+        if "album" in tags:
+            music_file.album = tags['album'][0]
+        if "artist" in tags:
+            music_file.artist = tags['artist'][0]
+        if "albumartist" in tags:
+            music_file.albumartist = tags['albumartist'][0]
+        if "date" in tags:
+            music_file.year = tags['date'][0]
+        else:
+            music_file.year = None
+        if "comment" in tags:
+            music_file.comment = tags['comment'][0]
+        music_file.relative_path = relative_path
+        music_file.id = "%s - %s - %s - %s" % \
+                        (music_file.albumartist, music_file.album, music_file.year, music_file.title)
+        check_music_file(music_file)
 
 
 def tree_tags(root):
-    for item in sorted(os.listdir(root)):
-        f = os.path.join(root, item)
+    for i in sorted(os.listdir(root)):
+        f = os.path.join(root, i)
         if os.path.isdir(f):
             tree_tags(f)
         elif os.path.isfile(f):
@@ -208,8 +213,8 @@ def tree_tags(root):
 
 
 def tree_files(root):
-    for item in sorted(os.listdir(root)):
-        f = os.path.join(root, item)
+    for i in sorted(os.listdir(root)):
+        f = os.path.join(root, i)
         if os.path.isdir(f):
             manage_dir(f)
             tree_files(f)
@@ -219,7 +224,7 @@ def tree_files(root):
 
 def read_config_file(filename):
     with open(config_dir + filename) as f:
-        return [x.strip() for x in f.readlines()]
+        return [i.strip() for i in f.readlines()]
 
 
 def init_config():
@@ -257,7 +262,6 @@ init_config()
 
 if len(sys.argv) != 2 and len(sys.argv) != 3:
     show_info()
-
 else:
     if len(sys.argv) == 2:
         args = sys.argv[1]
