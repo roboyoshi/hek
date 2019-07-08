@@ -10,7 +10,7 @@ Python script that checks your music collection given a set of rules
 
 ## Installation
 ```bash
-$ git clone https://gitlab.com/dunon/hek.git
+$ git clone https://github.com/dunon/hek.git
 $ cd hek
 $ sudo cp hek.py /usr/bin/hek
 ```
@@ -45,4 +45,4 @@ Stored in `~/.config/hek`
 - Ignore how directory ends `ignore_dir_ends`
 
 ## License
-hek is released under the GNU GPL-3.0 license. See `LICENSE` for details.
+hek is released under the GNU GPLv3 license. See `LICENSE` for details.
