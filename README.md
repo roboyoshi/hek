@@ -4,6 +4,8 @@ Python script that checks your music collection given a set of rules
 
 - Does not modify files
 - Reads FLAC and mp3 tags
+- Checks capitalization, filetypes, missing tags
+- Manage exceptions
 
 ## Depends on
 - `python-mutagen`
@@ -14,18 +16,20 @@ $ git clone https://github.com/dunon/hek.git
 $ cd hek
 $ sudo cp hek.py /usr/bin/hek
 ```
+### Arch Linux
+Available on the [AUR](https://aur.archlinux.org/packages/hek/)
 
 ## Usage
 ```bash
 $ hek ~/Music
 $ hek .                 # run on current directory
 $ hek -v                # display version
-$ hek ~/Music --files   # check files only
+$ hek ~/Music --files    # check files only
 $ hek ~/Music --tags    # check tags only
 ```
 
 ## Configuration
-See `example_config`
+See [example_config](https://github.com/dunon/hek/tree/master/example_config)
 
 ### Rules
 Stored in `~/.config/hek/rules`
