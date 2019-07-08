@@ -7,6 +7,8 @@ Python script that checks your music collection given a set of rules
 - Checks capitalization, filetypes, missing tags
 - Manage exceptions
 
+![hek](demo.gif)
+
 ## Depends on
 - `python-mutagen`
 
